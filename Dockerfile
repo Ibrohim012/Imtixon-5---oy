@@ -46,6 +46,10 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install
 
+
+RUN npm install typeorm passport cookie-parser express-rate-limit
+
+
 # Copy the rest of the application code
 COPY . .
 
