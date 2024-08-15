@@ -1,0 +1,136 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  User
+  Admin
+  Superadmin
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+model User {
+  id                            String    @id @default(uuid())
+  email                         String    @unique
+  password                      String
+  phoneNumber                   String
+  username                      String
+  gender                        Gender
+  role                          Role
+  emailVerificationToken        String?
+  emailVerificationTokenExpires DateTime?
+  emailVerified                 Boolean   @default(false)
+  isActive                      Boolean   @default(true)
+  createdAt                     DateTime  @default(now())
+  updatedAt                     DateTime  @updatedAt
+  tokens                        Token[]
+  orders                        Order[]   @relation("UserOrders")
+  reviews                       Review[]  @relation("UserReviews")
+}
+
+model Token {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Restaurant {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  address     String
+  phoneNumber String
+  rating      Float    @default(0.0)
+  meals       Meal[]
+  reviews     Review[]
+  orders      Order[]
+}
+
+model Category {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+  meals       Meal[]
+}
+
+model Meal {
+  id           String       @id @default(uuid())
+  name         String
+  description  String?
+  price        Float
+  imageUrl     String?
+  restaurant   Restaurant   @relation(fields: [restaurantId], references: [id])
+  restaurantId String
+  category     Category     @relation(fields: [categoryId], references: [id])
+  categoryId   String
+  orderItems   OrderItems[]
+  reviews      Review[]
+}
+
+model Order {
+  id           String       @id @default(uuid())
+  totalAmount  Float
+  status       String       @default("Pending")
+  user         User         @relation("UserOrders", fields: [userId], references: [id])
+  userId       String
+  restaurant   Restaurant   @relation(fields: [restaurantId], references: [id])
+  restaurantId String
+  orderItems   OrderItems[] @relation("OrderItems_Order")
+  payment      Payment?     @relation("Order_Payment")
+  paymentId    String? // Nullable field for optional relation
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+}
+
+model OrderItems {
+  id        String   @id @default(uuid())
+  orderId   String
+  mealId    String
+  quantity  Int
+  price     Decimal  @default(0.0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  order Order @relation("OrderItems_Order", fields: [orderId], references: [id], onDelete: Cascade)
+  meal  Meal  @relation(fields: [mealId], references: [id], onDelete: Cascade)
+}
+
+model Review {
+  id           String     @id @default(uuid())
+  rating       Float
+  comment      String?
+  user         User       @relation("UserReviews", fields: [userId], references: [id])
+  userId       String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  restaurantId String
+  meal         Meal       @relation(fields: [mealId], references: [id])
+  mealId       String
+}
+
+model Payment {
+  id      String @id @default(uuid())
+  payment_method  String
+  amount  Float
+  status  String @default("Pending")
+  order   Order  @relation("Order_Payment", fields: [orderId], references: [id])
+  orderId String @unique
+}
