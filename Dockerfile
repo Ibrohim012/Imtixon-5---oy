@@ -44,10 +44,12 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install
+RUN npm i pnpm
+
+RUN pnpm i
 
 
-RUN npm install typeorm passport cookie-parser express-rate-limit
+RUN pnpm install typeorm passport cookie-parser express-rate-limit
 
 
 # Copy the rest of the application code
