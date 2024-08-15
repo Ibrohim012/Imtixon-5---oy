@@ -1,16 +1,30 @@
-import { InputType, Field, Int, Float } from '@nestjs/graphql';
+import { ApiProperty } from '@nestjs/swagger';
 
-@InputType()
 export class CreateOrderItemDto {
-  @Field()
-  orderId: string;
+  @ApiProperty({
+    description: 'The unique identifier of the order item',
+    example: '123456',
+    required: false, 
+  })
+  orderId?: string;
 
-  @Field()
-  mealId: string;
+  @ApiProperty({
+    description: 'The unique identifier of the meal',
+    example: '78910',
+    required: false, 
+  })
+  mealId?: string;
 
-  @Field(() => Int)
+  @ApiProperty({
+    description: 'The quantity of the meal in the order',
+    example: 2,
+  })
   quantity: number;
 
-  @Field(() => Float)
-  price: number;
+  @ApiProperty({
+    description: 'The price of the meal',
+    example: 19.99,
+    required: false, 
+  })
+  price?: number;
 }

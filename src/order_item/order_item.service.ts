@@ -1,6 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateOrderItemDto } from './dto/create-order_item.dto';
+import { OrderItem } from './entities/order_item.entity';
+import { UpdateOrderItemDto } from './dto/update-order_item.dto';
 
 @Injectable()
 export class OrderItemService {
@@ -17,6 +19,10 @@ export class OrderItemService {
       },
     });
   }
+  
+  async findAll() {
+    return this.prisma.orderItems.findMany();
+  }
 
   asyncfindAll() {
     return this.prisma.orderItems.findMany();
@@ -30,12 +36,12 @@ export class OrderItemService {
     return orderItem;
   }
 
-  async update(id: string, updateOrderItemDto: CreateOrderItemDto) {
+  async update(id: string, updateOrderItemDto: UpdateOrderItemDto) {
     return this.prisma.orderItems.update({
       where: { id },
       data: updateOrderItemDto,
     });
-  }
+  }s
 
   async remove(id: string) {
     return this.prisma.orderItems.delete({ where: { id } });

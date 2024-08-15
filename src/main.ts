@@ -3,9 +3,25 @@ import { AppModule } from './app.module';
 import * as session from 'express-session';
 import * as passport from 'passport';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ValidationPipe } from '@nestjs/common';
+import * as cookieParser from 'cookie-parser';
+import rateLimit from 'express-rate-limit';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.useGlobalPipes(new ValidationPipe({
+    transform: true,
+    whitelist: true,
+  }));
+  
+  app.use(cookieParser());
+
+  const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+  });
+
 
   const config = new DocumentBuilder()
     .setTitle('Yandex Eats API')
