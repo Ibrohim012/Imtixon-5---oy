@@ -32,7 +32,7 @@ model User {
   phoneNumber                   String
   username                      String
   gender                        Gender
-  role                          Role
+  role                          Role      
   emailVerificationToken        String?
   emailVerificationTokenExpires DateTime?
   emailVerified                 Boolean   @default(false)
